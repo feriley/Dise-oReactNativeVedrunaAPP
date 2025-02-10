@@ -9,11 +9,15 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.24.0",
+    "@react-native-firebase/app": "^21.8.0",
+    "@react-native-firebase/auth": "^21.8.0",
     "@react-navigation/native": "^7.0.14",
     "@react-navigation/stack": "^7.1.1",
     "expo": "~52.0.31",
     "expo-splash-screen": "~0.29.21",
     "expo-status-bar": "~2.0.1",
+    "firebase": "^11.3.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.7",
@@ -31,3 +35,5 @@
   },
   "private": true
 }
+
+

@@ -1,12 +1,44 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import React, { useState } from 'react';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  StyleSheet, 
+  Image, 
+  Alert 
+} from 'react-native';
+
+// 1️⃣ Importamos la función de Firebase para login
+import { signInWithEmailAndPassword } from 'firebase/auth';
+// 2️⃣ Importamos la instancia de auth desde tu archivo firebase.js
+// (Asegúrate de tener un archivo en src/config/firebase.js con export const auth = getAuth(app);)
+import { auth } from '../config/firebase';
 
 const LoginScreen = ({ navigation }) => {
+  // 3️⃣ Creamos los estados para email y contraseña
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  // 4️⃣ Función para manejar el login al presionar "Log in"
+  const handleLogin = async () => {
+    try {
+      // signInWithEmailAndPassword retorna una promesa
+      await signInWithEmailAndPassword(auth, email.trim(), password);
+      // Si todo va bien, navegamos a la pantalla Home
+      navigation.navigate('Home');
+    } catch (error) {
+      // Si ocurre un error, lo mostramos con un Alert
+      Alert.alert('Error al iniciar sesión', error.message);
+      // También puedes hacer console.log(error) para ver detalles en la consola
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Imagen en la parte superior */}
       <Image
-        source={require('../../assets/images/4b369d5d71efbfa1f6961ee2c182d04d.png')} // Ruta corregida
+        source={require('../../assets/images/4b369d5d71efbfa1f6961ee2c182d04d.png')} 
         style={styles.image}
       />
 
@@ -15,12 +47,20 @@ const LoginScreen = ({ navigation }) => {
       <Text style={styles.subtitle}>EDUCACION</Text>
 
       {/* Campos de entrada */}
-      <TextInput style={styles.input} placeholder="Introduce su correo" placeholderTextColor="#808080" />
+      <TextInput
+        style={styles.input}
+        placeholder="Introduce su correo"
+        placeholderTextColor="#808080"
+        value={email}
+        onChangeText={setEmail}  // Guardamos en el estado
+      />
       <TextInput
         style={styles.input}
         placeholder="Introduce su contraseña"
         placeholderTextColor="#808080"
         secureTextEntry
+        value={password}
+        onChangeText={setPassword}  // Guardamos en el estado
       />
 
       {/* Olvidaste tu contraseña */}
@@ -31,7 +71,7 @@ const LoginScreen = ({ navigation }) => {
       {/* Botón Log in */}
       <TouchableOpacity 
         style={styles.loginButton} 
-        onPress={() => navigation.navigate('Home')} // Ahora lleva a Home en lugar de "Tab"
+        onPress={handleLogin} // Llamamos a la función que loguea en Firebase
       >
         <Text style={styles.loginButtonText}>Log in</Text>
       </TouchableOpacity>
@@ -50,6 +90,7 @@ const LoginScreen = ({ navigation }) => {
   );
 };
 
+// Estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -121,6 +162,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#9FC63B',
     fontWeight: 'bold',
+  },
+  bottomContainer: {
+    // Para organizar la "línea horizontal" y el enlace de crear cuenta
   },
 });
 

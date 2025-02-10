@@ -1,11 +1,10 @@
 import React from 'react';
-import { registerRootComponent } from 'expo'; // <-- Importar de Expo
+import { registerRootComponent } from 'expo';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import LoginScreen from './src/screens/LoginScreen';
+import LoginScreen from './src/screens/LoginScreen'; // <-- Ruta correcta
 import SignUpScreen from './src/screens/SignUpScreen';
 import HomeScreen from './src/screens/HomeScreen';
-import { name as appName } from './app.json';
 
 const Stack = createStackNavigator();
 
@@ -21,6 +20,4 @@ export default function App() {
   );
 }
 
-// Asegúrate de que "appName" es "VedrunaApp" (el valor raíz de app.json):
-registerRootComponent(App); // <-- Registrar con Expo
-
+registerRootComponent(App);
