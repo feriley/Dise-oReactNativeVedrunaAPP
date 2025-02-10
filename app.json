@@ -1,13 +1,15 @@
 {
+  "name": "VedrunaApp",          // <- Esto es para React Native
+  "displayName": "VedrunaApp",   // <- Opcional, a veces se usa en RN puro
   "expo": {
-    "name": "VedrunaApp",
+    "name": "VedrunaApp",        // <- Esto es para Expo
     "slug": "VedrunaApp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true
     },
@@ -18,12 +20,9 @@
       }
     },
     "web": {
-      "bundler": "metro",
-      "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router",
       [
         "expo-splash-screen",
         {
@@ -35,7 +34,7 @@
       ]
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": false
     }
   }
 }
