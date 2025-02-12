@@ -6,7 +6,10 @@ import LoginScreen from './src/screens/LoginScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import AddScreen from './src/screens/AddScreen';
-import DetallePublicacion from './src/screens/DetallePublicacion'; // 🔹 Importamos la pantalla de detalles
+import DetallePublicacion from './src/screens/DetallePublicacion';
+import IncidenciasScreen from './src/screens/IncidenciasScreen'; 
+import CrearIncidenciaScreen from './src/screens/CrearIncidenciaScreen';
+import PerfilScreen from './src/screens/PerfilScreen';
 
 const Stack = createStackNavigator();
 
@@ -19,6 +22,9 @@ export default function App() {
         <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Add" component={AddScreen} options={{ headerShown: false }} />
         <Stack.Screen name="DetallePublicacion" component={DetallePublicacion} options={{ headerShown: false }} />
+        <Stack.Screen name="Incidencias" component={IncidenciasScreen} options={{ headerShown: false }} /> 
+        <Stack.Screen name="CrearIncidencia" component={CrearIncidenciaScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Perfil" component={PerfilScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

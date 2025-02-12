@@ -12,11 +12,15 @@ import * as ImagePicker from 'expo-image-picker';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
-const AddScreen = () => {
+// 🔹 URL del backend
+const API_URL = 'http://192.168.0.18:8080/proyecto01/incidencias';
+
+const CrearIncidenciaScreen = () => {
   const navigation = useNavigation();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [image, setImage] = useState(null); 
+  const [numEquipo, setNumEquipo] = useState('');
+  const [titulo, setTitulo] = useState('');
+  const [descripcion, setDescripcion] = useState('');
+  const [image, setImage] = useState(null); // Estado para la imagen
 
   // 🔹 Función para abrir la galería y seleccionar una imagen
   const pickImage = async () => {
@@ -32,45 +36,47 @@ const AddScreen = () => {
     }
   };
 
-  // 🔹 Función para publicar la publicación
-  const handlePublish = async () => {
-    if (!image || title.trim() === '' || description.trim() === '') {
-      Alert.alert('Error', 'Debes completar todos los campos y seleccionar una imagen.');
+  // 🔹 Función para enviar la incidencia a la API
+  const handleSubmit = async () => {
+    if (!image || numEquipo.trim() === '' || titulo.trim() === '' || descripcion.trim() === '') {
+      Alert.alert('Error', 'Debes completar todos los campos y adjuntar una imagen.');
       return;
     }
 
-    if (title.length > 40 || description.length > 250) {
+    if (titulo.length > 40 || descripcion.length > 250) {
       Alert.alert('Error', 'Título máx: 40 caracteres. Descripción máx: 250 caracteres.');
       return;
     }
 
-    const newPost = {
-      user_id: "123456",
-      image_url: image, 
-      titulo: title,
-      comentario: description,
+    const nuevaIncidencia = {
+      user_id: "123456", 
+      num_equipo: numEquipo,
+      image_url: image,
+      titulo: titulo,
+      descripcion: descripcion,
+      estado: "EN TRÁMITE" // Estado inicial x defecto cuando creamos una incidencia.
     };
 
     try {
-      const response = await fetch('http://192.168.0.18:8080/proyecto01/publicaciones', {
+      const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newPost),
+        body: JSON.stringify(nuevaIncidencia),
       });
 
-      if (!response.ok) throw new Error('Error al enviar la publicación');
+      if (!response.ok) throw new Error('Error al enviar la incidencia');
 
-      Alert.alert('Publicado', 'Tu publicación ha sido enviada correctamente.');
-      navigation.navigate('Home');
+      Alert.alert('Éxito', 'Incidencia reportada correctamente.');
+      navigation.navigate('Incidencias'); 
     } catch (error) {
       console.error('Error:', error);
-      Alert.alert('Error', 'Hubo un problema al publicar.');
+      Alert.alert('Error', 'Hubo un problema al reportar la incidencia.');
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>PUBLICACIÓN</Text>
+      <Text style={styles.title}>INCIDENCIA</Text>
 
       {/* 🔹 Botón para seleccionar imagen */}
       <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
@@ -81,17 +87,26 @@ const AddScreen = () => {
         )}
       </TouchableOpacity>
 
+      <Text style={styles.label}>Nº de equipo / clase:</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Ej: Aula 101 / PC-05"
+        placeholderTextColor="#808080"
+        value={numEquipo}
+        onChangeText={setNumEquipo}
+      />
+
       <Text style={styles.label}>Título:</Text>
       <TextInput
         style={styles.input}
         placeholder="Máx. 40 caracteres"
         placeholderTextColor="#808080"
         maxLength={40}
-        value={title}
-        onChangeText={setTitle}
+        value={titulo}
+        onChangeText={setTitulo}
       />
 
-      <Text style={styles.label}>Descripción:</Text>
+      <Text style={styles.label}>Descripción problema:</Text>
       <TextInput
         style={[styles.input, styles.descriptionInput]}
         placeholder="Máx. 250 caracteres"
@@ -99,29 +114,13 @@ const AddScreen = () => {
         maxLength={250}
         multiline
         numberOfLines={4}
-        value={description}
-        onChangeText={setDescription}
+        value={descripcion}
+        onChangeText={setDescripcion}
       />
 
-      <TouchableOpacity style={styles.publishButton} onPress={handlePublish}>
-        <Text style={styles.publishButtonText}>Publicar</Text>
+      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+        <Text style={styles.submitButtonText}>ENVIAR</Text>
       </TouchableOpacity>
-
-      {/* 🔹 Menú de navegación (Tab Bar) */}
-      <View style={styles.tabBar}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-          <Ionicons name="home" size={24} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Add')}>
-          <FontAwesome5 name="plus-circle" size={24} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Incidencias')}>
-          <Ionicons name="settings" size={24} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Perfil')}>
-          <FontAwesome5 name="user-alt" size={24} color="white" />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
@@ -175,30 +174,20 @@ const styles = StyleSheet.create({
     height: 80,
     textAlignVertical: 'top',
   },
-  publishButton: {
-    backgroundColor: '#9FC63B',
+  submitButton: {
+    borderColor: '#9FC63B',
+    borderWidth: 2,
     paddingVertical: 15,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 20,
     width: '100%',
   },
-  publishButtonText: {
+  submitButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  tabBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#23272A',
-    paddingVertical: 10,
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    borderTopWidth: 1,
-    borderTopColor: '#323639'
   }
 });
 
-export default AddScreen;
+export default CrearIncidenciaScreen;

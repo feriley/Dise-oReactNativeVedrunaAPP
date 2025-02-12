@@ -14,19 +14,17 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
 
 const SignUpScreen = ({ navigation }) => {
-  // 2️⃣ Estados para email y password (al menos)
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   // (Opcional) Estado para "Repita contraseña"
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  // También tienes otros campos (Nick, Nombre, etc.) que no se guardarán en Firebase Auth,
-  // solo en caso de necesitar base de datos (Firestore).
+ 
 
   // 3️⃣ Función para manejar el registro
   const handleSignUp = async () => {
-    // (Opcional) Verificar si las contraseñas coinciden
+    // Verificar si las contraseñas coinciden
     if (password !== confirmPassword) {
       Alert.alert('Error', 'Las contraseñas no coinciden');
       return;

@@ -22,7 +22,7 @@ const obtenerImagen = (imageUrl) => {
     "publi3.jpg": require('../../assets/images/publi3.jpg'),
   };
 
-  return imagenesLocales[imageUrl] || { uri: imageUrl }; // Si no es local, intenta usarla como URL
+  return imagenesLocales[imageUrl] || { uri: imageUrl }; // Si no es local, usarla como URL
 };
 
 const HomeScreen = () => {
@@ -38,15 +38,15 @@ const HomeScreen = () => {
 
         const transformedPosts = data.map((post) => ({
           id: post.id,
-          user: "Usuario", // 🔹 Se actualizará cuando implementemos usuarios reales
+          user: "Usuario", 
           userImage: require('../../assets/images/imgperfil.jpg'),
-          postImage: obtenerImagen(post.image_url), // 🔹 Imagen dinámica desde la API o local
-          timeAgo: "Hace 4 días", // 🔹 Se puede mejorar con `createdAt`
+          postImage: obtenerImagen(post.image_url),
+          timeAgo: "Hace 4 días", 
           likes: post.like.length || 0,
           liked: false,
           title: post.titulo,
           description: post.comentario,
-          comments: 0 // 🔹 Implementaremos comentarios luego
+          comments: 0 
         }));
 
         setPosts(transformedPosts);

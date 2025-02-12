@@ -26,7 +26,7 @@ const DetallePublicacion = ({ route }) => {
   const [nuevoComentario, setNuevoComentario] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
 
-  const userId = "789012"; // 🔹 Asegúrate de usar el ID real del usuario
+  const userId = "789012"; // MODIFICAR --> ARREGLAR ID DE USUARIO
 
   // 🔹 Obtener comentarios de la API cuando se carga la pantalla
   useEffect(() => {
@@ -61,9 +61,9 @@ const DetallePublicacion = ({ route }) => {
     }
 
     const comentarioData = {
-      user_id: userId, // Usuario autenticado
-      idPublicacion: post.id, // ID de la publicación seleccionada
-      comentario: nuevoComentario, // Comentario ingresado por el usuario
+      user_id: userId, 
+      idPublicacion: post.id, 
+      comentario: nuevoComentario, 
     };
 
     console.log("📤 Enviando comentario:", comentarioData);
@@ -174,7 +174,7 @@ const DetallePublicacion = ({ route }) => {
   );
 };
 
-// 📌 Estilos actualizados (solo esta sección cambia)
+// 📌 Estilos 
 const styles = StyleSheet.create({
     container: {
       flex: 1,

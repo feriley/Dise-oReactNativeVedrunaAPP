@@ -52,7 +52,7 @@ const LoginScreen = ({ navigation }) => {
         placeholder="Introduce su correo"
         placeholderTextColor="#808080"
         value={email}
-        onChangeText={setEmail}  // Guardamos en el estado
+        onChangeText={setEmail}  
       />
       <TextInput
         style={styles.input}
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   bottomContainer: {
-    // Para organizar la "línea horizontal" y el enlace de crear cuenta
+    
   },
 });
 
