@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,38 +11,43 @@ import { useNavigation } from '@react-navigation/native';
 import { auth } from '../config/firebase';
 import { AntDesign, Ionicons, FontAwesome5 } from '@expo/vector-icons';
 
+// 🔹 URL del backend
+const API_URL = 'http://192.168.0.18:8080/proyecto01/publicaciones';
+
 const HomeScreen = () => {
   const navigation = useNavigation();
+  const [posts, setPosts] = useState([]);
 
-  // 🔹 Simulación de publicaciones (esto luego vendrá del microservicio)
-  const [posts, setPosts] = useState([
-    {
-      id: '1',
-      user: 'juanperez',
-      userImage: require('../../assets/images/imgperfil.jpg'),
-      postImage: require('../../assets/images/publi1.jpg'),
-      timeAgo: 'Hace 2 días',
-      likes: 10,
-      liked: false,
-      title: 'DIALOGOS SOBRE ACEITES Y NUTRUCIÓN',
-      description: 'Sesión de formación, de la mano de de @aceite.orujo , @malnutridos & @juan_revenga en FP VEDRUNA sobre mitos y utilidad del aceite de orujo',
-      comments: 3
-    },
-    {
-      id: '2',
-      user: 'maria23',
-      userImage: require('../../assets/images/imgperfil.jpg'),
-      postImage: require('../../assets/images/publi3.jpg'),
-      timeAgo: 'Hace 5 horas',
-      likes: 25,
-      liked: false,
-      title: 'DIALOGOS SOBRE ACEITES Y NUTRUCIÓN',
-      description: 'Sesión de formación, de la mano de de @aceite.orujo , @malnutridos & @juan_revenga en FP VEDRUNA sobre mitos y utilidad del aceite de oruj',
-      comments: 7
-    }
-  ]);
+  // 🔹 Cargar publicaciones desde la API
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
 
-  // 🔹 Función para dar Like
+        const transformedPosts = data.map((post) => ({
+          id: post.id,
+          user: "Usuario", // 🔹 La API no devuelve el usuario, podemos mejorarlo luego
+          userImage: require('../../assets/images/imgperfil.jpg'),
+          postImage: require('../../assets/images/publi1.jpg'), // 🔹 Imagen por defecto
+          timeAgo: "Hace X días", // 🔹 Se puede calcular con `createdAt`
+          likes: post.like.length || 0,
+          liked: false,
+          title: post.titulo,
+          description: post.comentario,
+          comments: 0 // 🔹 Implementaremos los comentarios después
+        }));
+
+        setPosts(transformedPosts);
+      } catch (error) {
+        console.error("Error al cargar publicaciones:", error);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
+  // 🔹 Función para dar Like (Actualizar la API en el futuro)
   const toggleLike = (id) => {
     setPosts(
       posts.map((post) =>
@@ -53,20 +58,18 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* 🔹 Encabezado */}
       <View style={styles.header}>
         <Image source={require('../../assets/images/4b369d5d71efbfa1f6961ee2c182d04d.png')} style={styles.logo} />
         <Text style={styles.headerText}>VEDRUNA</Text>
         <Text style={styles.userNick}>{auth.currentUser?.displayName || 'Usuario'}</Text>
       </View>
 
-      {/* 🔹 Lista de publicaciones */}
+      {/* 🔹 Lista de publicaciones desde la API */}
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.postContainer}>
-            {/* 🔹 Info del usuario */}
             <View style={styles.postHeader}>
               <Image source={item.userImage} style={styles.userImage} />
               <View>
@@ -75,10 +78,8 @@ const HomeScreen = () => {
               </View>
             </View>
 
-            {/* 🔹 Imagen de la publicación */}
             <Image source={item.postImage} style={styles.postImage} />
 
-            {/* 🔹 Botón de Like */}
             <View style={styles.reactions}>
               <TouchableOpacity onPress={() => toggleLike(item.id)}>
                 <AntDesign name={item.liked ? "heart" : "hearto"} size={24} color={item.liked ? "red" : "black"} />
@@ -86,7 +87,6 @@ const HomeScreen = () => {
               <Text style={styles.likesText}>{item.likes} Me gusta</Text>
             </View>
 
-            {/* 🔹 Información de la publicación */}
             <Text style={styles.postTitle}>{item.title}</Text>
             <Text style={styles.postDescription}>{item.description}</Text>
             <Text style={styles.commentsText}>{item.comments} Comentarios</Text>
@@ -94,7 +94,6 @@ const HomeScreen = () => {
         )}
       />
 
-      {/* 🔹 Menú de navegación */}
       <View style={styles.tabBar}>
         <TouchableOpacity onPress={() => navigation.navigate('Home')}>
           <Ionicons name="home" size={24} color="white" />
@@ -113,7 +112,8 @@ const HomeScreen = () => {
   );
 };
 
-// 📌 Estilos
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -14,9 +14,9 @@ import { useNavigation } from '@react-navigation/native';
 
 const AddScreen = () => {
   const navigation = useNavigation();
-  const [image, setImage] = useState(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [image, setImage] = useState(null); // 🔹 Estado para la imagen
 
   // 🔹 Función para abrir la galería y seleccionar una imagen
   const pickImage = async () => {
@@ -32,35 +32,44 @@ const AddScreen = () => {
     }
   };
 
-  // 🔹 Función para publicar
-  const handlePublish = () => {
+  // 🔹 Función para publicar la publicación
+  const handlePublish = async () => {
     if (!image || title.trim() === '' || description.trim() === '') {
       Alert.alert('Error', 'Debes completar todos los campos y seleccionar una imagen.');
       return;
     }
 
-    if (title.length > 40) {
-      Alert.alert('Error', 'El título no puede tener más de 40 caracteres.');
+    if (title.length > 40 || description.length > 250) {
+      Alert.alert('Error', 'Título máx: 40 caracteres. Descripción máx: 250 caracteres.');
       return;
     }
 
-    if (description.length > 250) {
-      Alert.alert('Error', 'La descripción no puede tener más de 250 caracteres.');
-      return;
+    const newPost = {
+      user_id: "123456",
+      image_url: image, // 🔹 Ahora usa la imagen seleccionada
+      titulo: title,
+      comentario: description,
+    };
+
+    try {
+      const response = await fetch('http://192.168.0.18:8080/proyecto01/publicaciones', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newPost),
+      });
+
+      if (!response.ok) throw new Error('Error al enviar la publicación');
+
+      Alert.alert('Publicado', 'Tu publicación ha sido enviada correctamente.');
+      navigation.navigate('Home');
+    } catch (error) {
+      console.error('Error:', error);
+      Alert.alert('Error', 'Hubo un problema al publicar.');
     }
-
-    Alert.alert('Publicado', 'Tu publicación ha sido enviada correctamente.');
-
-    // 🔹 Aquí luego conectaremos con Firebase/MongoDB
-    // (Enviar datos al microservicio cuando lo integremos)
-
-    // Navegar de vuelta a Home
-    navigation.navigate('Home');
   };
 
   return (
     <View style={styles.container}>
-      {/* 🔹 Título con margen superior */}
       <Text style={styles.title}>PUBLICACIÓN</Text>
 
       {/* 🔹 Botón para seleccionar imagen */}
@@ -72,7 +81,6 @@ const AddScreen = () => {
         )}
       </TouchableOpacity>
 
-      {/* 🔹 Campo de Título */}
       <Text style={styles.label}>Título:</Text>
       <TextInput
         style={styles.input}
@@ -83,7 +91,6 @@ const AddScreen = () => {
         onChangeText={setTitle}
       />
 
-      {/* 🔹 Campo de Descripción */}
       <Text style={styles.label}>Descripción:</Text>
       <TextInput
         style={[styles.input, styles.descriptionInput]}
@@ -96,7 +103,6 @@ const AddScreen = () => {
         onChangeText={setDescription}
       />
 
-      {/* 🔹 Botón de Publicar */}
       <TouchableOpacity style={styles.publishButton} onPress={handlePublish}>
         <Text style={styles.publishButtonText}>Publicar</Text>
       </TouchableOpacity>
@@ -120,7 +126,7 @@ const AddScreen = () => {
   );
 };
 
-// 📌 Estilos con margen superior para el título y tab bar
+// 📌 **Estilos**
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -132,7 +138,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#9FC63B',
-    marginTop: 40, // 🔹 Agregamos margen superior
+    marginTop: 40,
     marginBottom: 20,
   },
   imagePicker: {
