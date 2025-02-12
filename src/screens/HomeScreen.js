@@ -9,10 +9,21 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../config/firebase';
-import { AntDesign, Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { AntDesign, Ionicons, FontAwesome5, FontAwesome } from '@expo/vector-icons';
 
 // 🔹 URL del backend
 const API_URL = 'http://192.168.0.18:8080/proyecto01/publicaciones';
+
+// 🔹 Mapea imágenes locales
+const obtenerImagen = (imageUrl) => {
+  const imagenesLocales = {
+    "publi1.jpg": require('../../assets/images/publi1.jpg'),
+    "publi2.jpg": require('../../assets/images/publi2.jpg'),
+    "publi3.jpg": require('../../assets/images/publi3.jpg'),
+  };
+
+  return imagenesLocales[imageUrl] || { uri: imageUrl }; // Si no es local, intenta usarla como URL
+};
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -27,15 +38,15 @@ const HomeScreen = () => {
 
         const transformedPosts = data.map((post) => ({
           id: post.id,
-          user: "Usuario", // 🔹 La API no devuelve el usuario, podemos mejorarlo luego
+          user: "Usuario", // 🔹 Se actualizará cuando implementemos usuarios reales
           userImage: require('../../assets/images/imgperfil.jpg'),
-          postImage: require('../../assets/images/publi1.jpg'), // 🔹 Imagen por defecto
-          timeAgo: "Hace X días", // 🔹 Se puede calcular con `createdAt`
+          postImage: obtenerImagen(post.image_url), // 🔹 Imagen dinámica desde la API o local
+          timeAgo: "Hace 4 días", // 🔹 Se puede mejorar con `createdAt`
           likes: post.like.length || 0,
           liked: false,
           title: post.titulo,
           description: post.comentario,
-          comments: 0 // 🔹 Implementaremos los comentarios después
+          comments: 0 // 🔹 Implementaremos comentarios luego
         }));
 
         setPosts(transformedPosts);
@@ -47,13 +58,18 @@ const HomeScreen = () => {
     fetchPosts();
   }, []);
 
-  // 🔹 Función para dar Like (Actualizar la API en el futuro)
+  // 🔹 Función para dar Like (actualizará en la API en el futuro)
   const toggleLike = (id) => {
     setPosts(
       posts.map((post) =>
         post.id === id ? { ...post, liked: !post.liked, likes: post.liked ? post.likes - 1 : post.likes + 1 } : post
       )
     );
+  };
+
+  // 🔹 Navegar a la pantalla de detalles de la publicación
+  const handlePressPost = (post) => {
+    navigation.navigate('DetallePublicacion', { post });
   };
 
   return (
@@ -69,31 +85,39 @@ const HomeScreen = () => {
         data={posts}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.postContainer}>
-            <View style={styles.postHeader}>
-              <Image source={item.userImage} style={styles.userImage} />
-              <View>
-                <Text style={styles.postUser}>Publicado por {item.user}</Text>
-                <Text style={styles.postTime}>{item.timeAgo}</Text>
+          <TouchableOpacity onPress={() => handlePressPost(item)}>
+            <View style={styles.postContainer}>
+              <View style={styles.postHeader}>
+                <Image source={item.userImage} style={styles.userImage} />
+                <View>
+                  <Text style={styles.postUser}>Publicado por {item.user}</Text>
+                  <Text style={styles.postTime}>{item.timeAgo}</Text>
+                </View>
               </View>
+
+              <Image source={item.postImage} style={styles.postImage} />
+
+              <View style={styles.reactions}>
+                {/* Botón de Like */}
+                <TouchableOpacity onPress={() => toggleLike(item.id)}>
+                  <AntDesign name={item.liked ? "heart" : "hearto"} size={24} color={item.liked ? "red" : "black"} />
+                </TouchableOpacity>
+                <Text style={styles.likesText}>{item.likes} Me gusta</Text>
+
+                {/* Botón de Comentarios */}
+                <TouchableOpacity style={styles.commentButton} onPress={() => handlePressPost(item)}>
+                  <FontAwesome name="comment" size={24} color="#9FC63B" />
+                </TouchableOpacity>
+              </View>
+
+              <Text style={styles.postTitle}>{item.title}</Text>
+              <Text style={styles.postDescription}>{item.description}</Text>
             </View>
-
-            <Image source={item.postImage} style={styles.postImage} />
-
-            <View style={styles.reactions}>
-              <TouchableOpacity onPress={() => toggleLike(item.id)}>
-                <AntDesign name={item.liked ? "heart" : "hearto"} size={24} color={item.liked ? "red" : "black"} />
-              </TouchableOpacity>
-              <Text style={styles.likesText}>{item.likes} Me gusta</Text>
-            </View>
-
-            <Text style={styles.postTitle}>{item.title}</Text>
-            <Text style={styles.postDescription}>{item.description}</Text>
-            <Text style={styles.commentsText}>{item.comments} Comentarios</Text>
-          </View>
+          </TouchableOpacity>
         )}
       />
 
+      {/* 🔹 Barra de navegación */}
       <View style={styles.tabBar}>
         <TouchableOpacity onPress={() => navigation.navigate('Home')}>
           <Ionicons name="home" size={24} color="white" />
@@ -112,8 +136,7 @@ const HomeScreen = () => {
   );
 };
 
-
-
+// 📌 Estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -182,6 +205,9 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     color: '#FFF'
   },
+  commentButton: {
+    marginLeft: 15
+  },
   postTitle: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -190,10 +216,6 @@ const styles = StyleSheet.create({
   postDescription: {
     fontSize: 14,
     color: '#FFF'
-  },
-  commentsText: {
-    fontSize: 12,
-    color: '#BBB'
   },
   tabBar: {
     flexDirection: 'row',
